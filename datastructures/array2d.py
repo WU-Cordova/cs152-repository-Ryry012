@@ -3,34 +3,50 @@ import os
 from typing import Iterator, Sequence
 
 from datastructures.iarray import IArray
+from datastructures.array import Array
 from datastructures.iarray2d import IArray2D, T
 
 
 class Array2D(IArray2D[T]):
+
     class Row(IArray2D.IRow[T]):
-        def __init__(self, row_index: int, array: IArray, num_columns: int) -> None:
+        def __init__(self, row_index: int, array: IArray, num_columns: int, data_type: type) -> None:
             self.row_index = row_index
             self.array = array
             self.num_columns = num_columns
+            self.data_type = data_type
+            #raise NotImplementedError('Row.__init__ not implemented.')
 
         def __getitem__(self, column_index: int) -> T:
+            if column_index >= self.num_columns:
+                raise IndexError("Index too big.")
             index = self.map_index(self.row_index, column_index)
+
             return self.array[index]
         
-        def __setitem__(self, column_index: int, value: T) -> None:
-            index = self.map_index(self.row_index, column_index)
-            self.array[index] = value 
-         
-        def map_index(self, row_index: int, column_index: int) -> int:
+            #raise NotImplementedError('Row.__getitem__ not implemented.')
+        
+        def map_index(self, row_index, column_index):
             return row_index * self.num_columns + column_index
+        
+        def __setitem__(self, column_index: int, value: T) -> None:
+            index = self.map_index(self.row_index, column_index= column_index)
 
+            self.array[index] = value
+            
+            #raise NotImplementedError('Row.__setitem__ not implemented.')
+        
         def __iter__(self) -> Iterator[T]:
+            
             for column_index in range(self.num_columns):
                 yield self[column_index]
+                
+            #raise NotImplementedError('Row.__iter__ not implemented.')
         
         def __reversed__(self) -> Iterator[T]:
-            for column_index in range(self.num_columns - 1, -1, -1):
-                yield self[column_index]
+            for col_num in reversed(range(self.num_columns)):
+                yield self[col_num]
+            raise NotImplementedError('Row.__reversed__ not implemented.')
 
         def __len__(self) -> int:
             return self.num_columns
@@ -39,45 +55,86 @@ class Array2D(IArray2D[T]):
             return f"[{', '.join([str(self[column_index]) for column_index in range(self.num_columns)])}]"
         
         def __repr__(self) -> str:
-            return f'Row {self.row_index}: [{", ".join([str(self[column_index]) for column_index in range(self.num_columns)])}]'
+            return f'Row {self.row_index}: [{", ".join([str(self[column_index]) for column_index in range(self.num_columns - 1)])}, {str(self[self.num_columns - 1])}]'
 
-    def __init__(self, starting_sequence: Sequence[Sequence[T]] = [[]], data_type=object) -> None:
-        self.rows = len(starting_sequence)
-        self.columns = len(starting_sequence[0]) if self.rows > 0 else 0
-        self._data = []
 
-        for row in starting_sequence:
-            if len(row) != self.columns:
-                raise ValueError(f"Row must have {self.columns} columns, but got {len(row)}.")
-            self._data.append(row)
+    def __init__(self, starting_sequence: Sequence[Sequence[T]]=[[]], data_type=object) -> None:
+
+        if not isinstance(starting_sequence, Sequence):
+            raise ValueError("Entered sequence is not a sequence.")
+        
+        for element in starting_sequence:
+            if not isinstance(element, Sequence):
+                raise ValueError("")
+            
+            for item in element:
+                if not isinstance(item, data_type):
+                    raise ValueError("Your data types are not the same.")
+
+        self.data_type = data_type
+        self.row_len = len(starting_sequence)
+        self.column_len = len(starting_sequence[0])
+
+        for element in starting_sequence:
+            if self.column_len != len(element):
+                raise ValueError("Your sequences are not all equally long.")
+        
+        self.array2D = Array([data_type() for item in range(self.row_len * self.column_len)], data_type= data_type)
+
+        index = 0
+        for row_index in range(self.row_len):
+            for column_index in range(self.column_len):
+                
+                self.array2D[index] = starting_sequence[row_index][column_index]
+                index += 1
+
+
+
+        #raise NotImplementedError('Array2D.__init__ not implemented.')
 
     @staticmethod
-    def empty(rows: int = 0, cols: int = 0, data_type: type = object) -> Array2D:
-        return Array2D([[data_type() for _ in range(cols)] for _ in range(rows)], data_type)
+    def empty(rows: int=0, cols: int=0, data_type: type=object) -> Array2D:
+        starting_sequence = []
+        
+        for row in range(rows):
+            starting_sequence.append([])
+            for col in range(cols):
+                starting_sequence[row].append(data_type())
+
+        return Array2D(starting_sequence= starting_sequence, data_type= data_type)
+
+        #raise NotImplementedError('Array2D.empty not implemented.')
 
     def __getitem__(self, row_index: int) -> Array2D.IRow[T]:
-        if row_index >= self.rows or row_index < -self.rows:
-            raise IndexError(f'{row_index} is out of bounds. Valid range is -{self.rows} to {self.rows-1}.')
-        return Array2D.Row(row_index, self, self.columns)
-
+        if row_index >= self.row_len:
+            raise IndexError("Index too big.")
+        return Array2D.Row(row_index, self.array2D, self.column_len, self.data_type) 
+        #raise NotImplementedError('Array2D.__getitem__ not implemented.')
+    
     def __iter__(self) -> Iterator[Sequence[T]]:
-        for row in self._data:
-            yield row
-
+        for num_row in range(self.row_len):
+            yield self[num_row]
+        #return self.array2D.__iter__()
+        #raise NotImplementedError('Array2D.__iter__ not implemented.')
+    
     def __reversed__(self):
-        for row in reversed(self._data):
-            yield row
-
-    def __len__(self):
-        return self.rows
-
-    def __str__(self) -> str:
-        return f'[{", ".join([str(row) for row in self])}]'
-
-    def __repr__(self) -> str:
-        return f'Array2D {self.rows} Rows x {self.columns} Columns, items: {str(self)}'
+        for num_row in reversed(range(self.row_len)):
+            yield self[num_row]
+        #raise NotImplementedError('Array2D.__reversed__ not implemented.')
+    
+    def __len__(self): 
+        return self.row_len
+        #raise NotImplementedError('Array2D.__len__ not implemented')
+                                  
+    def __str__(self) -> str: 
+        return f'[{", ".join(f"{str(row)}" for row in self)}]'
+    
+    def __repr__(self) -> str: 
+        return f'Array2D {self.row_len} Rows x {self.column_len} Columns, items: {str(self)}'
 
 
 if __name__ == '__main__':
     filename = os.path.basename(__file__)
     print(f'This is the {filename} file.\nDid you mean to run your tests or program.py file?\nFor tests, run them from the Test Explorer on the left.')
+array2d.py
+Displaying array2d.py.
