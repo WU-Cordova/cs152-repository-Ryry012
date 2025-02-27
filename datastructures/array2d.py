@@ -58,6 +58,9 @@ class Array2D(IArray2D[T]):
     def __getitem__(self, row_index: int) -> Array2D.IRow[T]:
         if row_index >= self.rows or row_index < -self.rows:
             raise IndexError(f'{row_index} is out of bounds.')
+        # Support negative indexing by adjusting the row index
+        if row_index < 0:
+            row_index += self.rows
         return Array2D.Row(row_index, self, self.columns)
 
     def __iter__(self) -> Iterator[Sequence[T]]:
