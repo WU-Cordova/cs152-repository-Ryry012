@@ -67,6 +67,7 @@ class Array2D(IArray2D[T]):
     def __reversed__(self):
         for row in reversed(self._data):
             yield row
+           
 
     def __len__(self):
         return self.rows
