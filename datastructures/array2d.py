@@ -20,7 +20,7 @@ class Array2D(IArray2D[T]):
         def __setitem__(self, column_index: int, value: T) -> None:
             index = self.map_index(self.row_index, column_index)
             self.array[index] = value 
-        
+         
         def map_index(self, row_index: int, column_index: int) -> int:
             return row_index * self.num_columns + column_index
 
@@ -48,7 +48,7 @@ class Array2D(IArray2D[T]):
 
         for row in starting_sequence:
             if len(row) != self.columns:
-                raise ValueError("All rows must have the same number of columns.")
+                raise ValueError(f"Row must have {self.columns} columns, but got {len(row)}.")
             self._data.append(row)
 
     @staticmethod
@@ -57,10 +57,7 @@ class Array2D(IArray2D[T]):
 
     def __getitem__(self, row_index: int) -> Array2D.IRow[T]:
         if row_index >= self.rows or row_index < -self.rows:
-            raise IndexError(f'{row_index} is out of bounds.')
-        # Support negative indexing by adjusting the row index
-        if row_index < 0:
-            row_index += self.rows
+            raise IndexError(f'{row_index} is out of bounds. Valid range is -{self.rows} to {self.rows-1}.')
         return Array2D.Row(row_index, self, self.columns)
 
     def __iter__(self) -> Iterator[Sequence[T]]:
