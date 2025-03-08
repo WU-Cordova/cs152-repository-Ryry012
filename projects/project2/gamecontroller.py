@@ -24,12 +24,13 @@ class GameController:
         return neighbors
 
     def update_grid(self):
-        new_grid = [[Cell(x, y) for y in range(self.cols)] for x in range(self.rows)]
+        new_grid = [[Cell(x, y, self.grid[x][y].get_state()) for y in range(self.cols)] for x in range(self.rows)]
         for x in range(self.rows):
             for y in range(self.cols):
                 neighbors = self.count_neighbors(x, y)
                 new_grid[x][y].update_state(neighbors)
         self.grid = new_grid
+        self.grid_history.append([row[:] for row in self.grid])
 
     def check_stagnation(self):
         return self.grid in self.grid_history[-3:]
@@ -40,7 +41,6 @@ class GameController:
             if self.check_stagnation():
                 print("The grid has stabilized or is repeating!")
                 break
-
             mode = input("Enter 'A' for Automatic, 'M' for Manual, 'Q' to quit: ").strip().upper()
             if mode == 'A':
                 while not self.check_stagnation():

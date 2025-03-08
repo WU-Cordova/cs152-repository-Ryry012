@@ -1,5 +1,6 @@
 import random
 import time
+import os
 
 class Cell:
     def __init__(self, alive=False):
@@ -40,12 +41,13 @@ class Grid:
         self.grid = new_grid
 
     def display(self):
+        os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal screen
         for row in self.grid:
             print(" ".join(['X' if cell.alive else '.' for cell in row]))
         print()
 
 def main():
-    width, height = 5, 5
+    width, height = 15, 15  # Set grid size to 15x15
     grid = Grid(width, height)
 
     while True:
