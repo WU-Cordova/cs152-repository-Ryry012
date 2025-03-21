@@ -1,48 +1,81 @@
-import os
+from typing import Any, Sequence
+from datastructures.array import Array
 from datastructures.iqueue import IQueue, T
-from datastructures.linkedlist import LinkedList
 
-class Queue(IQueue[T]): 
-    def __init__(self) -> None:
-        self._queue = LinkedList()
+class CircularQueue(IQueue[T]):
+    """ Represents a fixed-size circular queue using an array.
+    """
+    
+    def __init__(self, maxsize: int = 0, data_type=object) -> None:
+        ''' Initializes the CircularQueue object. '''
+        starting_sequence = [data_type() for _ in range(maxsize + 1)]
+        self.circularqueue = Array(starting_sequence=starting_sequence, data_type=data_type)
+        self._front = 0
+        self._rear = 0
 
     def enqueue(self, item: T) -> None:
-        self._queue.prepend(item)
+        ''' Adds an item to the rear of the queue. '''
+        if self.full:
+            raise IndexError("Queue is full")
+        self.circularqueue[self._rear] = item
+        self._rear = (self._rear + 1) % len(self.circularqueue)
 
     def dequeue(self) -> T:
-        return self._queue.pop_back()
+        ''' Removes and returns the item at the front of the queue. '''
+        if self.empty:
+            raise IndexError("Queue is empty")
+        item = self.circularqueue[self._front]
+        self._front = (self._front + 1) % len(self.circularqueue)
+        return item
 
+    def clear(self) -> None:
+        ''' Removes all items from the queue. '''
+        self.circularqueue = Array(len(self.circularqueue))
+        self._front = 0
+        self._rear = 0
+
+    @property
     def front(self) -> T:
-        return self._queue.back()
+        ''' Returns the item at the front without removing it. '''
+        if self.empty:
+            raise IndexError("Queue is empty")
+        return self.circularqueue[self._front]
 
-    def back(self) -> T:
-        return self._queue.front()
+    @property
+    def full(self) -> bool:
+        ''' Checks if the queue is full. '''
+        return (self._rear + 1) % len(self.circularqueue) == self._front
 
-    def size(self) -> int: 
-        return len(self._queue)
+    @property
+    def empty(self) -> bool:
+        ''' Checks if the queue is empty. '''
+        return self._front == self._rear
 
-    def is_empty(self) -> bool: 
-        return self._queue.is_empty()
-
-    def clear(self) -> None: 
-        self._queue.clear()
-
-
-    def __contains__(self, item: T) -> bool:
-        for i in self._queue:
-            if item == i:
-                return True
-        return False
+    @property
+    def maxsize(self) -> int:
+        ''' Returns the maximum size of the queue. '''
+        return len(self.circularqueue) - 1
 
     def __eq__(self, other: object) -> bool:
-        return self._queue == other
+        ''' Checks if two CircularQueues are equal. '''
+        if not isinstance(other, CircularQueue):
+            return False
+        if self._front != other._front or self._rear != other._rear:
+            return False
+        return all(
+            self.circularqueue[(self._front + i) % len(self.circularqueue)] ==
+            other.circularqueue[(other._front + i) % len(other.circularqueue)]
+            for i in range(len(self))
+        )
 
-    def __str__(self) -> str: 
-        return str(self._queue)
+    def __len__(self) -> int:
+        ''' Returns the number of items in the queue. '''
+        return (self._rear - self._front + len(self.circularqueue)) % len(self.circularqueue)
 
-    def __repr__(self) -> str: 
-        return f'ListQueue({self._queue})'
+    def __str__(self) -> str:
+        ''' Returns a string representation of the queue. '''
+        return str(self.circularqueue)
 
-if __name__ == '__main__':
-    filename = os.path.basename(__file__)
-    print(f'This is the {filename} file.\nDid you mean to run your tests or program.py file?\nFor tests, run them from the Test Explorer on the left.')
+    def __repr__(self) -> str:
+        ''' Returns a detailed string representation of the queue. '''
+        return f'CircularQueue({repr(self.circularqueue)})'
