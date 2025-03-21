@@ -1,6 +1,5 @@
 import pytest
 
-
 from datastructures.arraystack import ArrayStack
 
 
