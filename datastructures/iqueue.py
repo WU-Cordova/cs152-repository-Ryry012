@@ -1,95 +1,48 @@
-from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, List
+import os
+from datastructures.iqueue import IQueue, T
+from datastructures.linkedlist import LinkedList
 
-T = TypeVar('T')
-
-class IQueue(Generic[T], ABC):
-    @abstractmethod
-    def enqueue(self, item: T) -> None:
-        pass
-
-    @abstractmethod
-    def dequeue(self) -> T:
-        pass
-
-    @abstractmethod
-    def front(self) -> T:
-        pass
-
-    @abstractmethod
-    def back(self) -> T:
-        pass
-
-    @abstractmethod
-    def __len__(self) -> int:
-        pass
-
-    @abstractmethod
-    def empty(self) -> bool:
-        pass
-
-    @abstractmethod
-    def clear(self) -> None:
-        pass
-
-    @abstractmethod
-    def __contains__(self, item: T) -> bool:
-        pass
-
-    @abstractmethod
-    def __eq__(self, other: object) -> bool:
-        pass
-
-    @abstractmethod
-    def __str__(self) -> str:
-        pass
-
-    @abstractmethod
-    def __repr__(self) -> str:
-        pass
-
-
-class ArrayQueue(IQueue[T]):
+class Queue(IQueue[T]): 
     def __init__(self) -> None:
-        self._data: List[T] = []
+        self._queue = LinkedList()
 
     def enqueue(self, item: T) -> None:
-        self._data.append(item)
+        self._queue.prepend(item)
 
     def dequeue(self) -> T:
-        if self.empty():
-            raise IndexError("Cannot dequeue: Queue is empty")
-        return self._data.pop(0)
+        return self._queue.pop_back()
 
     def front(self) -> T:
-        if self.empty():
-            raise IndexError("Cannot get front: Queue is empty")
-        return self._data[0]
+        return self._queue.back()
 
     def back(self) -> T:
-        if self.empty():
-            raise IndexError("Cannot get back: Queue is empty")
-        return self._data[-1]
+        return self._queue.front()
 
-    def __len__(self) -> int:
-        return len(self._data)
+    def size(self) -> int: 
+        return len(self._queue)
 
-    def empty(self) -> bool:
-        return len(self._data) == 0
+    def is_empty(self) -> bool: 
+        return self._queue.is_empty()
 
-    def clear(self) -> None:
-        self._data.clear()
+    def clear(self) -> None: 
+        self._queue.clear()
+
 
     def __contains__(self, item: T) -> bool:
-        return item in self._data
+        for i in self._queue:
+            if item == i:
+                return True
+        return False
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, ArrayQueue):
-            return False
-        return self._data == other._data
+        return self._queue == other
 
-    def __str__(self) -> str:
-        return f"Queue({self._data})"
+    def __str__(self) -> str: 
+        return str(self._queue)
 
-    def __repr__(self) -> str:
-        return f"ArrayQueue({self._data})"
+    def __repr__(self) -> str: 
+        return f'ListQueue({self._queue})'
+
+if __name__ == '__main__':
+    filename = os.path.basename(__file__)
+    print(f'This is the {filename} file.\nDid you mean to run your tests or program.py file?\nFor tests, run them from the Test Explorer on the left.')
