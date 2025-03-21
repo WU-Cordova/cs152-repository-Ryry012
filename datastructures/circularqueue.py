@@ -4,64 +4,155 @@ from datastructures.array import Array
 from datastructures.iqueue import IQueue, T
 
 class CircularQueue(IQueue[T]):
-    def __init__(self, maxsize: int = 10, data_type=object) -> None:
-        self._maxsize = maxsize
-        self._data = Array(maxsize, data_type)
-        self._front = 0
-        self._rear = 0
-        self._size = 0
+    """ Represents a fixed-size circular queue. The queue
+        is circular in the sense that the front and rear pointers wrap around the
+        array when they reach the end. The queue is full when the rear pointer is
+        one position behind the front pointer. The queue is empty when the front
+        and rear pointers are equal. This implementation uses a fixed-size array.
+    """
+
+    def __init__(self, maxsize: int = 0, data_type=object) -> None:
+        ''' Initializes the CircularQueue object with a maxsize and data_type.
+        
+            Arguments:
+                maxsize: The maximum size of the queue
+                data_type: The type of the elements in the queue
+        '''
+        raise NotImplementedError
 
     def enqueue(self, item: T) -> None:
-        if self.full:
-            raise IndexError("Queue is full")
-        self._data[self._rear] = item
-        self._rear = (self._rear + 1) % self._maxsize
-        self._size += 1
+        ''' Adds an item to the rear of the queue
+
+            Examples:
+                >>> q = CircularQueue(maxsize=5, data_type=int)
+                >>> q.enqueue(1)
+                >>> q.enqueue(2)
+                >>> q.enqueue(3)
+                >>> q.front
+                1
+                >>> q.rear
+                3
+                >>> q.enqueue(4)
+                >>> q.enqueue(5)
+                >>> q.full
+                True
+                >>> q.enqueue(6)
+                IndexError('Queue is full')
+            
+            Arguments:
+                item: The item to add to the queue
+                
+            Raises:
+                IndexError: If the queue is full
+        '''
+        raise NotImplementedError
 
     def dequeue(self) -> T:
-        if self.empty:
-            raise IndexError("Queue is empty")
-        item = self._data[self._front]
-        self._front = (self._front + 1) % self._maxsize
-        self._size -= 1
-        return item
+        ''' Removes and returns the item at the front of the queue
+
+            Examples:
+                >>> q = CircularQueue(maxsize=5, data_type=int)
+                >>> q.enqueue(1)
+                >>> q.enqueue(2)
+                >>> q.enqueue(3)
+                >>> q.dequeue()
+                1
+                >>> q.dequeue()
+                2
+                >>> q.dequeue()
+                3
+                >>> q.dequeue()
+                IndexError('Queue is empty')
+                >>> q.dequeue()
+                IndexError('Queue is empty')
+
+            Returns:
+                The item at the front of the queue
+
+            Raises:
+                IndexError: If the queue is empty
+        '''
+        raise NotImplementedError
 
     def clear(self) -> None:
-        self._front = 0
-        self._rear = 0
-        self._size = 0
+        ''' Removes all items from the queue '''
+        raise NotImplementedError
 
     @property
     def front(self) -> T:
-        if self.empty:
-            raise IndexError("Queue is empty")
-        return self._data[self._front]
+        ''' Returns the item at the front of the queue without removing it
+
+            Returns:
+                The item at the front of the queue
+
+            Raises:
+                IndexError: If the queue is empty
+        '''
+        raise NotImplementedError
 
     @property
     def full(self) -> bool:
-        return self._size == self._maxsize
+        ''' Returns True if the queue is full, False otherwise 
+        
+            Returns:
+                True if the queue is full, False otherwise
+        '''
+        raise NotImplementedError
 
     @property
     def empty(self) -> bool:
-        return self._size == 0
+        ''' Returns True if the queue is empty, False otherwise
+        
+            Returns:
+                True if the queue is empty, False otherwise
+        '''
+        raise NotImplementedError
     
     @property
     def maxsize(self) -> int:
-        return self._maxsize
+        ''' Returns the maximum size of the queue
+        
+            Returns:
+                The maximum size of the queue
+        '''
+        raise NotImplementedError
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, CircularQueue) or len(self) != len(other):
-            return False
-        for i in range(len(self)):
-            if self._data[(self._front + i) % self._maxsize] != other._data[(other._front + i) % other._maxsize]:
-                return False
-        return True
+        ''' Returns True if this CircularQueue is equal to another object, False otherwise
+        
+            Equality is defined as:
+                - The front and rear pointers are equal
+                - The elements between the front and rear pointers are equal, even if they are in different positions
+                
+            Arguments:
+                other: The object to compare this CircularQueue to
+                
+            Returns:
+                True if this CircularQueue is equal to another object, False otherwise
+        '''
+        raise NotImplementedError   
     
     def __len__(self) -> int:
-        return self._size
+        ''' Returns the number of items in the queue
+        
+            Returns:
+                The number of items in the queue
+        '''
+        raise NotImplementedError
 
     def __str__(self) -> str:
-        return str([self._data[(self._front + i) % self._maxsize] for i in range(self._size)])
+        ''' Returns a string representation of the CircularQueue
+        
+            Returns:
+                A string representation of the queue
+        '''
+        return str(self.circularqueue)
 
     def __repr__(self) -> str:
-        return f'CircularQueue(maxsize={self._maxsize}, items={str(self)})'
+        ''' Returns a developer string representation of the CircularQueue object
+        
+            Returns:
+                A string representation of the CircularQueue object
+        '''
+        return f'ArrayQueue({repr(self.circularqueue)})'
+                                  
