@@ -35,10 +35,34 @@ class LinkedList[T](ILinkedList[T]):
         self.count += 1
 
     def prepend(self, item: T) -> None:
-        raise NotImplementedError("LinkedList.prepend is not implemented")
+        node = LinkedList(data=item)
 
+        if self.empty:
+            self.head = self.tail = node
+
+        else:
+            node.next = self.head
+            self.head.previous = node
+            self.head = node
+
+        self.count += 1
+        self.head = None
+        self.tail = None
     def insert_before(self, target: T, item: T) -> None:
-        raise NotImplementedError("LinkedList.insert_before is not implemented")
+        traveler = self.head
+
+        while travler:
+            
+            if travel.data == target:
+                break 
+
+            traveler = traveler.next
+
+        if travel is None
+            raise ValueError(f"{target} not found in linked list")
+        if travel is self.head:
+            self.prepend(item)
+            return
 
     def insert_after(self, target: T, item: T) -> None:
         raise NotImplementedError("LinkedList.insert_after is not implemented")
