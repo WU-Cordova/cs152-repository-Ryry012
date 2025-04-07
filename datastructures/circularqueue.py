@@ -4,68 +4,46 @@ from datastructures.iqueue import IQueue
 
 T = TypeVar('T')
 
-class CircularQueue(IQueue[T], Generic[T]):
-    def __init__(self, maxsize: int = 0, data_type=object) -> None:
-        self._maxsize = maxsize
-        self._data_type = data_type
-        self._queue = Array(maxsize, data_type)
-        self._front = 0
-        self._rear = 0
-        self._size = 0
+class CircularQueue:
+    def __init__(self, maxsize):
+        self.maxsize = maxsize
+        self.queue = [None] * maxsize
+        self.front = 0
+        self.rear = 0
+        self.size = 0
 
-    def enqueue(self, item: T) -> None:
-        if self.full:
+    def enqueue(self, item):
+        if self.size == self.maxsize:
             raise IndexError("Queue is full")
-        self._queue[self._rear] = item
-        self._rear = (self._rear + 1) % self._maxsize
-        self._size += 1
+        self.queue[self.rear] = item
+        self.rear = (self.rear + 1) % self.maxsize
+        self.size += 1
 
-    def dequeue(self) -> T:
-        if self.empty:
+    def dequeue(self):
+        if self.size == 0:
             raise IndexError("Queue is empty")
-        item = self._queue[self._front]
-        self._front = (self._front + 1) % self._maxsize
-        self._size -= 1
+        item = self.queue[self.front]
+        self.front = (self.front + 1) % self.maxsize
+        self.size -= 1
         return item
 
-    def clear(self) -> None:
-        self._front = 0
-        self._rear = 0
-        self._size = 0
-
-    @property
-    def front(self) -> T:
-        if self.empty:
+    def peek(self):
+        if self.size == 0:
             raise IndexError("Queue is empty")
-        return self._queue[self._front]
+        return self.queue[self.front]
 
-    @property
-    def full(self) -> bool:
-        return self._size == self._maxsize
+    def is_empty(self):
+        return self.size == 0
 
-    @property
-    def empty(self) -> bool:
-        return self._size == 0
-    
-    @property
-    def maxsize(self) -> int:
-        return self._maxsize
+    def is_full(self):
+        return self.size == self.maxsize
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, CircularQueue):
-            return False
-        if self._size != other._size or self._maxsize != other._maxsize:
-            return False
-        for i in range(self._size):
-            if self._queue[(self._front + i) % self._maxsize] != other._queue[(other._front + i) % other._maxsize]:
-                return False
-        return True
-    
-    def __len__(self) -> int:
-        return self._size
+    def __len__(self):
+        return self.size
 
-    def __str__(self) -> str:
-        return str([self._queue[(self._front + i) % self._maxsize] for i in range(self._size)])
-
-    def __repr__(self) -> str:
-        return f'CircularQueue({repr(self._queue)})'
+    def __str__(self):
+        items = []
+        for i in range(self.size):
+            index = (self.front + i) % self.maxsize
+            items.append(self.queue[index])
+        return str(items)

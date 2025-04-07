@@ -136,6 +136,8 @@ class TestLinkedList:
         with pytest.raises(TypeError):
             LinkedList.from_sequence([1, 2, 3], data_type=str)
 
+
+
     def test_value_error_raised(self, linked_list: ILinkedList[int]) -> None:
         with pytest.raises(ValueError):
             linked_list.insert_before(10, 99)  # Target not in list
