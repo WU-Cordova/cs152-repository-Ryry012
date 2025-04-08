@@ -1,7 +1,5 @@
 import pytest
-
 from datastructures.arraystack import ArrayStack
-
 
 @pytest.fixture
 def stack() -> ArrayStack:
@@ -11,7 +9,7 @@ class TestArrayStack:
     def test_push(self, stack: ArrayStack) -> None:
         stack.push(1)
         assert len(stack) == 1
-        assert stack.peek == 1
+        assert stack.peek == 1  # Assuming peek is a @property
 
     def test_pop(self, stack: ArrayStack) -> None:
         stack.push(1)
@@ -89,3 +87,4 @@ class TestArrayStack:
     def test_repr(self, stack: ArrayStack) -> None:
         stack.push(1)
         stack.push(2)
+        assert repr(stack) == "ArrayStack([1, 2])"  # Adjust if your repr is different
