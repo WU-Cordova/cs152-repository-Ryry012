@@ -1,67 +1,63 @@
-from typing import Generic, TypeVar
-from datastructures.array import Array
-from datastructures.istack import IStack
+from collections.abc import Sequence
+from abc import ABC, abstractmethod
 
-T = TypeVar('T')
+class Array:
+    def __init__(self, sequence):
+        if not isinstance(sequence, Sequence):
+            raise ValueError("Sequence must be a valid sequence type.")
+        self._array = sequence
 
-class ArrayStack(IStack[T]):
-    def __init__(self, maxsize: int, data_type: type = object) -> None:
-        self.maxsize = maxsize
-        self._data_type = data_type
-        self.stack: Array[T] = Array(maxsize, data_type)
-        self.top = -1  # -1 means empty
+    def __len__(self):
+        return len(self._array)
 
-    def push(self, item: T) -> None:
-        if not isinstance(item, self._data_type):
-            raise TypeError(f"Expected {self._data_type}, got {type(item)}")
-        if self.is_full():
-            raise IndexError("Stack is full")
-        self.top += 1
-        self.stack[self.top] = item
+    def __getitem__(self, index):
+        return self._array[index]
 
-    def pop(self) -> T:
-        if self.is_empty():
-            raise IndexError("Stack is empty")
-        item = self.stack[self.top]
-        self.stack[self.top] = None
-        self.top -= 1
+    def __setitem__(self, index, value):
+        self._array[index] = value
+
+    def __iter__(self):
+        return iter(self._array)
+
+class ArrayStack(ABC):
+    def __init__(self, capacity):
+        self._size = 0
+        self._items = Array([None] * capacity)  # Initialize with empty sequence
+
+    def clear(self):
+        self._size = 0
+        self._items = Array([None] * len(self._items))  # Reset the array to its capacity
+
+    def __contains__(self, item):
+        for i in range(self._size):
+            if self._items[i] == item:
+                return True
+        return False
+
+    def push(self, item):
+        if self._size < len(self._items):
+            self._items[self._size] = item
+            self._size += 1
+        else:
+            raise ValueError("Stack is full.")
+
+    def pop(self):
+        if self._size == 0:
+            raise ValueError("Stack is empty.")
+        item = self._items[self._size - 1]
+        self._size -= 1
         return item
 
-    def peek(self) -> T:
-        if self.is_empty():
-            raise IndexError("Stack is empty")
-        return self.stack[self.top]
+    def peek(self):
+        if self._size == 0:
+            raise ValueError("Stack is empty.")
+        return self._items[self._size - 1]
 
-    def is_empty(self) -> bool:
-        return self.top == -1
+    def is_empty(self):
+        return self._size == 0
 
-    def is_full(self) -> bool:
-        return self.top + 1 == self.maxsize
+    def is_full(self):
+        return self._size == len(self._items)
 
-    @property
-    def empty(self) -> bool:
-        return self.is_empty()
-
-    @property
-    def full(self) -> bool:
-        return self.is_full()
-
-    def __len__(self) -> int:
-        return self.top + 1
-
-    def __str__(self) -> str:
-        items = [str(self.stack[i]) for i in range(self.top + 1)]
-        return f"[{', '.join(items)}]"
-
-    def __repr__(self) -> str:
-        return f"ArrayStack(maxsize={self.maxsize}, size={len(self)})"
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, ArrayStack):
-            return False
-        if len(self) != len(other):
-            return False
-        for i in range(self.top + 1):
-            if self.stack[i] != other.stack[i]:
-                return False
-        return True
+    def __len__(self):
+        return self._size
