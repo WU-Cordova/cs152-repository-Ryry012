@@ -1,63 +1,73 @@
-from collections.abc import Sequence
-from abc import ABC, abstractmethod
+import os
 
-class Array:
-    def __init__(self, sequence):
-        if not isinstance(sequence, Sequence):
-            raise ValueError("Sequence must be a valid sequence type.")
-        self._array = sequence
+from datastructures.array import Array, T
+from datastructures.istack import IStack
 
-    def __len__(self):
-        return len(self._array)
+class ArrayStack(IStack[T]):
+    def __init__(self, max_size: int = 0, data_type=object) -> None:
+        self._max_size = max_size
+        self._data_type = data_type
+        self._stack = Array(max_size, data_type)
+        self._top = 0
 
-    def __getitem__(self, index):
-        return self._array[index]
+    def push(self, item: T) -> None:
+        if self.full:
+            raise IndexError('Stack is full')
+        self._stack[self._top] = item
+        self._top += 1
 
-    def __setitem__(self, index, value):
-        self._array[index] = value
+    def pop(self) -> T:
+        if self.empty:
+            raise IndexError('Stack is empty')
+        self._top -= 1
+        return self._stack[self._top]
 
-    def __iter__(self):
-        return iter(self._array)
+    def clear(self) -> None:
+        self._top = 0
 
-class ArrayStack(ABC):
-    def __init__(self, capacity):
-        self._size = 0
-        self._items = Array([None] * capacity)  # Initialize with empty sequence
+    @property
+    def peek(self) -> T:
+        if self.empty:
+            raise IndexError('Stack is empty')
+        return self._stack[self._top - 1]
 
-    def clear(self):
-        self._size = 0
-        self._items = Array([None] * len(self._items))  # Reset the array to its capacity
+    @property
+    def maxsize(self) -> int:
+        return self._max_size
 
-    def __contains__(self, item):
-        for i in range(self._size):
-            if self._items[i] == item:
+    @property
+    def full(self) -> bool:
+        return self._top == self._max_size
+
+    @property
+    def empty(self) -> bool:
+        return self._top == 0
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ArrayStack):
+            return False
+        if self._top != other._top:
+            return False
+        for i in range(self._top):
+            if self._stack[i] != other._stack[i]:
+                return False
+        return True
+
+    def __len__(self) -> int:
+        return self._top
+    
+    def __contains__(self, item: T) -> bool:
+        for i in range(self._top):
+            if self._stack[i] == item:
                 return True
         return False
 
-    def push(self, item):
-        if self._size < len(self._items):
-            self._items[self._size] = item
-            self._size += 1
-        else:
-            raise ValueError("Stack is full.")
-
-    def pop(self):
-        if self._size == 0:
-            raise ValueError("Stack is empty.")
-        item = self._items[self._size - 1]
-        self._size -= 1
-        return item
-
-    def peek(self):
-        if self._size == 0:
-            raise ValueError("Stack is empty.")
-        return self._items[self._size - 1]
-
-    def is_empty(self):
-        return self._size == 0
-
-    def is_full(self):
-        return self._size == len(self._items)
-
-    def __len__(self):
-        return self._size
+    def __str__(self) -> str:
+        return str([self._stack[i] for i in range(self._top)])
+    
+    def __repr__(self) -> str:
+        return f"ArrayStack({self.maxsize}): items: {str(self)}"
+    
+if __name__ == '__main__':
+    filename = os.path.basename(__file__)
+    print(f'OOPS!\nThis is the {filename} file.\nDid you mean to run your tests or program.py file?\nFor tests, run them from the Test Explorer on the left.')
