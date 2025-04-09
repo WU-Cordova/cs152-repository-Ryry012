@@ -1,7 +1,9 @@
-from typing import Any
+from typing import Any, TypeVar
 
 from datastructures.array import Array
-from datastructures.iqueue import IQueue, T
+from datastructures.iqueue import IQueue
+
+T = TypeVar('T')
 
 class CircularQueue(IQueue[T]):
     """ Represents a fixed-size circular queue. The queue
@@ -49,7 +51,7 @@ class CircularQueue(IQueue[T]):
                 IndexError: If the queue is full
         '''
         if self.full:
-            raise IndexError
+            raise IndexError("Queue is full")
         self.circularqueue[self._rear] = item
         self._rear = (self._rear + 1) % len(self.circularqueue)
 
@@ -79,14 +81,14 @@ class CircularQueue(IQueue[T]):
                 IndexError: If the queue is empty
         '''
         if self.empty:
-            raise IndexError
+            raise IndexError("Queue is empty")
         item = self.circularqueue[self._front]
         self._front = (self._front + 1) % len(self.circularqueue)
         return item
 
     def clear(self) -> None:
         ''' Removes all items from the queue '''
-        self.circularqueue = Array(len(self.circularqueue))
+        self.circularqueue = Array([None] * len(self.circularqueue))
         self._front = 0
         self._rear = 0
 
@@ -101,7 +103,7 @@ class CircularQueue(IQueue[T]):
                 IndexError: If the queue is empty
         '''
         if self.empty:
-            raise IndexError
+            raise IndexError("Queue is empty")
         return self.circularqueue[self._front]
 
     @property
@@ -135,8 +137,9 @@ class CircularQueue(IQueue[T]):
         ''' Returns True if this CircularQueue is equal to another object, False otherwise
         
             Equality is defined as:
-                - The front and rear pointers are equal
-                - The elements between the front and rear pointers are equal, even if they are in different positions
+                - Both objects are CircularQueues
+                - They have the same logical sequence of elements (regardless of physical storage)
+                - They have the same length
                 
             Arguments:
                 other: The object to compare this CircularQueue to
@@ -147,14 +150,17 @@ class CircularQueue(IQueue[T]):
         if not isinstance(other, CircularQueue):
             return False
         
-        # Equality is: same front/rear and the elements between them are eq, even if they are in different positions
-
-        for item in range(len(self)):
-            if self.circularqueue[(self._front + item) % len(self)] != other.circularqueue[(other._front + item) % len(other)]:
+        if len(self) != len(other):
+            return False
+        
+        # Compare the logical sequence of elements
+        for i in range(len(self)):
+            self_idx = (self._front + i) % len(self.circularqueue)
+            other_idx = (other._front + i) % len(other.circularqueue)
+            if self.circularqueue[self_idx] != other.circularqueue[other_idx]:
                 return False
+        
         return True
-            
-                # all(self.circularqueue[(self._front + i) % len(self.circularqueue)] == other.circularqueue[(other._front + i) % len(other.circularqueue)] for i in range(len(self)))
 
     def __len__(self) -> int:
         ''' Returns the number of items in the queue
@@ -162,7 +168,7 @@ class CircularQueue(IQueue[T]):
             Returns:
                 The number of items in the queue
         '''
-        return  (self._rear - self._front + len(self.circularqueue)) % len(self.circularqueue)
+        return (self._rear - self._front + len(self.circularqueue)) % len(self.circularqueue)
 
     def __str__(self) -> str:
         ''' Returns a string representation of the CircularQueue
@@ -170,7 +176,11 @@ class CircularQueue(IQueue[T]):
             Returns:
                 A string representation of the queue
         '''
-        return str(self.circularqueue)
+        elements = []
+        for i in range(len(self)):
+            idx = (self._front + i) % len(self.circularqueue)
+            elements.append(str(self.circularqueue[idx]))
+        return f"CircularQueue([{', '.join(elements)}])"
 
     def __repr__(self) -> str:
         ''' Returns a developer string representation of the CircularQueue object
@@ -178,4 +188,4 @@ class CircularQueue(IQueue[T]):
             Returns:
                 A string representation of the CircularQueue object
         '''
-        return f'ArrayQueue({repr(self.circularqueue)})'
+        return f"CircularQueue(maxsize={self.maxsize}, data_type={self.circularqueue.data_type})"
