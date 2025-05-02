@@ -1,12 +1,13 @@
 from datastructures.linkedlist import LinkedList
 from projects.project3.Drink import Drink
 from projects.project3.Menu import Menu
-import __future__
+# import __future__  # Not needed — left here in case you want to decide
 
 class Customer_Order:
     def __init__(self, name: str) -> None:
         self._order = LinkedList(data_type= Drink)
-        self.name= name
+        self.name = name
+        self._count = 0  # added missing initialization
     
     def add_drink(self, drink) -> None:
         # print y / n ? for if they want to customize
@@ -36,7 +37,7 @@ class Customer_Order:
     # def total_sold(self) -> int:
     #     return self._count
 
-    def take_order(self) -> Drink:
+    def take_order(self) -> "Customer_Order":
         menu_obj = Menu()
         menu = menu_obj.return_items()
         menu_obj.print_menu()
@@ -55,8 +56,9 @@ class Customer_Order:
                 self.add_drink(menu[4])
             more = input('Would you like to order another? (Y)es or (N)o: ')
 
-        self._count =+ 1
+        self._count += 1  # fixed the bug here
         return self
+
     def __repr__(self):
         drinks = ", ".join(str(drink) for drink in self._order)
         return f"Order for {self.name}: [{drinks}] with {len(self._order)} drink(s)"
