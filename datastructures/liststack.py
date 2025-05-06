@@ -15,11 +15,11 @@ class ListStack(IStack[T]):
         return self._list.pop()
 
     def peek(self) -> T:
-        return self._list.back
+        return self._list.back()
 
     @property
     def empty(self) -> bool:
-        return self._list.empty
+        return self._list.empty()
 
     def clear(self):
         self._list.clear()

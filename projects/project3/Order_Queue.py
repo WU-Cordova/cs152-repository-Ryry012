@@ -1,6 +1,6 @@
 from datastructures.deque import Deque
 from datastructures.liststack import ListStack
-from projects.project3.Customer_Order import Customer_Order
+from Customer_Order import Customer_Order
 
 class Order_Queue:
     def __init__(self):
@@ -14,34 +14,34 @@ class Order_Queue:
         return self.queue.front()
 
     def complete_order(self) -> None:  
-        if self.queue._list.empty:
+        if self.queue.empty():
             print("No orders to complete.")
             return
         done = self.queue.dequeue()
         self._complete_queue.push(done)
 
     def view_open_orders(self):
-        if self.queue._list.empty:
+        if self.queue.empty():
             print("No open orders.")
             return
 
         print("\nOpen Orders:")
         temp_queue = Deque(data_type=Customer_Order)
 
-        while not self.queue._list.empty:
+        while not self.queue.empty():
             order = self.queue.dequeue()
             print(f"- {order.name}:")
             order.repeat_order()
             temp_queue.enqueue(order)
 
-        while not temp_queue._list.empty:
+        while not temp_queue.empty():
             self.queue.enqueue(temp_queue.dequeue())
 
     def end_of_day_report(self) -> None:
         drink_summary = {}
         total_revenue = 0.0
 
-        while not self._complete_queue.empty:
+        while not self._complete_queue.empty():
             order = self._complete_queue.pop()
             for drink in order._order:
                 name = drink.name

@@ -21,13 +21,13 @@ class Deque(IQueue[T]):
         return self._list.pop()
 
     def front(self) -> T:
-        return self._list.front
+        return self._list.front()
 
     def back(self) -> T:
-        return self._list.back
+        return self._list.back()
 
     def empty(self) -> bool:
-        return self._list.empty
+        return self._list.empty()
 
     def __len__(self) -> int:
         return len(self._list)

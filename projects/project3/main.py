@@ -1,7 +1,6 @@
-from projects.project3.Menu import Menu
-from projects.project3.Customer_Order import Customer_Order
-from projects.project3.Order_Queue import Order_Queue
-# from projects.project
+from Menu import Menu
+from Customer_Order import Customer_Order
+from Order_Queue import Order_Queue
 
 def main():
     order_queue = Order_Queue()
@@ -38,3 +37,6 @@ def main():
             break
         else:
             print("Invalid option.")
+
+if __name__ == '__main__':
+    main()
